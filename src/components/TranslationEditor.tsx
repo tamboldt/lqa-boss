@@ -184,6 +184,14 @@ export const TranslationEditor = forwardRef<TranslationEditorRef, TranslationEdi
   const filterTranslationUnits = (tus: TranslationUnit[]): TranslationUnit[] => {
     let filtered = tus
 
+    // Create a map of original translation units by GUID for quick lookup
+    const originalTuMap = new Map<string, TranslationUnit>()
+    if (originalJobData?.tus) {
+      originalJobData.tus.forEach(tu => {
+        originalTuMap.set(tu.guid, tu)
+      })
+    }
+
     // Apply review status filter first
     if (showOnlyNonReviewed) {
       filtered = filtered.filter(tu => !tu.ts)
@@ -202,7 +210,10 @@ export const TranslationEditor = forwardRef<TranslationEditorRef, TranslationEdi
       
       // Search in target text
       if (searchableFields.target) {
-        const targetText = tu.ntgt ? normalizedToString(tu.ntgt).toLowerCase() : ''
+        // Use original target text for filtering so edits don't affect filter results
+        const originalTu = originalTuMap.get(tu.guid)
+        const targetToSearch = originalTu?.ntgt ?? tu.ntgt
+        const targetText = targetToSearch ? normalizedToString(targetToSearch).toLowerCase() : ''
         if (targetText.includes(searchText)) return true
       }
       
