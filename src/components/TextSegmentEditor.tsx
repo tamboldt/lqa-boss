@@ -540,9 +540,8 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
             p={isActive ? 6 : 4}
             bg={isActive ? 'rgba(255, 255, 255, 0.95)' : getInactiveBg()}
             css={{
-              willChange: 'transform, background-color, border-color, box-shadow',
+              willChange: isActive ? 'transform' : 'auto',
               backfaceVisibility: 'hidden',
-              filter: isActive ? 'none' : 'blur(0.4px)',
             }}
             borderRadius="lg"
             border="1px solid"
@@ -551,7 +550,7 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
             borderLeftColor={getSegmentBorderColor(tu.guid)}
             boxShadow={isActive ? '0 8px 24px 0 rgba(59, 130, 246, 0.3)' : '0 2px 8px 0 rgba(0, 0, 0, 0.2)'}
             transform={isActive ? 'scale(1)' : 'scale(0.99)'}
-            transition="transform 0.4s ease-in-out, background-color 0.4s ease-in-out, border-color 0.4s ease-in-out, box-shadow 0.4s ease-in-out, filter 0.4s ease-in-out"
+            transition="transform 0.2s ease-in-out"
             onClick={() => onSegmentFocus(tu.guid)}
             cursor="pointer"
             minWidth={0}
@@ -561,7 +560,6 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
               borderColor: getSegmentBorderColor(tu.guid),
               transform: isActive ? 'scale(1) translateY(-1px)' : 'scale(0.99) translateY(-1px)',
               boxShadow: isActive ? '0 8px 16px 0 rgba(59, 130, 246, 0.4)' : '0 4px 8px 0 rgba(0, 0, 0, 0.4)',
-              filter: isActive ? 'none' : 'blur(0.2px)',
             }}
           >
             {/* Warning Icon - Visible in all states */}
