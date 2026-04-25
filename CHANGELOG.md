@@ -1,3 +1,16 @@
+## [1.0.4](https://github.com/tamboldt/lqa-boss/compare/v1.0.3...v1.0.4) (2026-04-25)
+
+
+### Bug Fixes
+
+* remove unused getSegmentBorderColor function ([1d776fd](https://github.com/tamboldt/lqa-boss/commit/1d776fd05b15511109cb91344f8c4a68a2ee632e))
+* remove unused getSegmentState function ([e33f93d](https://github.com/tamboldt/lqa-boss/commit/e33f93de09f3a3f8f4b5fd2b86a4ad58bc293142))
+
+
+### Performance Improvements
+
+* CRITICAL - cache segment computations + browser-native virtualization ([3b5af63](https://github.com/tamboldt/lqa-boss/commit/3b5af63024889716e2519391af30621e001a634c))
+
 ## [1.0.3](https://github.com/tamboldt/lqa-boss/compare/v1.0.2...v1.0.3) (2026-04-25)
 
 
