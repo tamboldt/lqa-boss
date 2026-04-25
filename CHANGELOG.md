@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/tamboldt/lqa-boss/compare/v1.0.0...v1.0.1) (2026-04-25)
+
+
+### Bug Fixes
+
+* search results now persist when editing target text ([9f97899](https://github.com/tamboldt/lqa-boss/commit/9f97899fba15e539093c64084d738558524c523c))
+
 ## [1.0.1](https://github.com/theresakhoo/lqa-boss/compare/v1.0.0...v1.0.1) (2026-04-24)
 
 
