@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/tamboldt/lqa-boss/compare/v1.0.1...v1.0.2) (2026-04-25)
+
+
+### Performance Improvements
+
+* memoize filteredJobData to eliminate typing lag ([8016a39](https://github.com/tamboldt/lqa-boss/commit/8016a39c99291dfe0cbd735ca3e568f620c82396))
+
 ## [1.0.1](https://github.com/tamboldt/lqa-boss/compare/v1.0.0...v1.0.1) (2026-04-25)
 
 
