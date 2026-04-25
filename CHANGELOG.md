@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/tamboldt/lqa-boss/compare/v1.0.2...v1.0.3) (2026-04-25)
+
+
+### Performance Improvements
+
+* optimize rendering performance for large files (500+ segments) ([e1502d9](https://github.com/tamboldt/lqa-boss/commit/e1502d93064258971c144fbdb6b2eb9ca5465222))
+
 ## [1.0.2](https://github.com/tamboldt/lqa-boss/compare/v1.0.1...v1.0.2) (2026-04-25)
 
 
