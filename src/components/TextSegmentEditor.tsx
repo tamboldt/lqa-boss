@@ -443,24 +443,6 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
 
     return { isValid: true }
   }
-  
-  const getSegmentBorderColor = (guid: string): string => {
-    const tu = tusByGuid.get(guid)
-
-    // Blue: Unreviewed segments
-    if (!tu?.ts) {
-      return 'blue.500'
-    }
-
-    // Reviewed segments - color based on state
-    const state = getSegmentState(guid)
-    switch (state) {
-      case 'original': return 'green.300'    // Green: Reviewed, unchanged from original
-      case 'saved': return 'yellow.400'      // Yellow: Reviewed, changed and saved
-      case 'modified': return 'red.500'      // Red: Reviewed, changed but not saved
-      default: return 'green.300'
-    }
-  }
 
   if (page && (!page.segments || page.segments.length === 0)) {
     return (
