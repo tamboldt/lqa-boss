@@ -155,6 +155,41 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
   const originalTusByGuid = useMemo(() => new Map(originalJobData.tus.map(tu => [tu.guid, tu])), [originalJobData.tus])
   const savedTusByGuid = useMemo(() => new Map(savedJobData.tus.map(tu => [tu.guid, tu])), [savedJobData.tus])
 
+  // Memoize expensive per-segment computations to avoid recalculating on every render
+  const segmentMetadata = useMemo(() => {
+    const cache = new Map()
+
+    jobData.tus.forEach(tu => {
+      const currentTu = tusByGuid.get(tu.guid)
+      const originalTu = originalTusByGuid.get(tu.guid)
+      const savedTu = savedTusByGuid.get(tu.guid)
+
+      if (!currentTu || !originalTu || !savedTu) {
+        cache.set(tu.guid, { state: 'original', borderColor: 'blue.500' })
+        return
+      }
+
+      // Compute state once
+      let state: 'original' | 'saved' | 'modified' = 'original'
+      if (normalizedArraysEqual(currentTu.ntgt || [], originalTu.ntgt || [])) {
+        state = 'original'
+      } else if (normalizedArraysEqual(currentTu.ntgt || [], savedTu.ntgt || [])) {
+        state = 'saved'
+      } else {
+        state = 'modified'
+      }
+
+      // Derive border color from state and review status
+      const borderColor = !currentTu.ts ? 'blue.500' :
+                         state === 'original' ? 'green.300' :
+                         state === 'saved' ? 'yellow.400' : 'red.500'
+
+      cache.set(tu.guid, { state, borderColor })
+    })
+
+    return cache
+  }, [jobData.tus, originalJobData.tus, savedJobData.tus, tusByGuid, originalTusByGuid, savedTusByGuid])
+
   // Handle Esc key to deselect segment
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -511,7 +546,11 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
           }
         }
 
-        const segmentState = getSegmentState(tu.guid)
+        // Use cached metadata instead of expensive function calls
+        const metadata = segmentMetadata.get(tu.guid) || { state: 'original', borderColor: 'blue.500' }
+        const segmentState = metadata.state
+        const segmentBorderColor = metadata.borderColor
+
         const qaValidation = getQAValidationStatus(tu.guid)
 
         // Extract placeholders from source for mapping display
@@ -542,12 +581,14 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
             css={{
               willChange: isActive ? 'transform' : 'auto',
               backfaceVisibility: 'hidden',
+              contentVisibility: 'auto',
+              containIntrinsicSize: '0 200px',
             }}
             borderRadius="lg"
             border="1px solid"
             borderColor={isActive ? 'rgba(59, 130, 246, 0.6)' : 'rgba(255, 255, 255, 0.2)'}
             borderLeftWidth="4px"
-            borderLeftColor={getSegmentBorderColor(tu.guid)}
+            borderLeftColor={segmentBorderColor}
             boxShadow={isActive ? '0 8px 24px 0 rgba(59, 130, 246, 0.3)' : '0 2px 8px 0 rgba(0, 0, 0, 0.2)'}
             transform={isActive ? 'scale(1)' : 'scale(0.99)'}
             transition="transform 0.2s ease-in-out"
@@ -557,7 +598,7 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
             maxW="100%"
             _hover={{
               bg: isActive ? 'rgba(255, 255, 255, 1)' : getHoverBg(),
-              borderColor: getSegmentBorderColor(tu.guid),
+              borderColor: segmentBorderColor,
               transform: isActive ? 'scale(1) translateY(-1px)' : 'scale(0.99) translateY(-1px)',
               boxShadow: isActive ? '0 8px 16px 0 rgba(59, 130, 246, 0.4)' : '0 4px 8px 0 rgba(0, 0, 0, 0.4)',
             }}
