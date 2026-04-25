@@ -383,27 +383,6 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
     }
   }, [tusByGuid, onTranslationUnitChange])
 
-  // Three-state system for segment state - based on ntgt changes
-  const getSegmentState = (guid: string): 'original' | 'saved' | 'modified' => {
-    const currentTu = tusByGuid.get(guid)
-    const originalTu = originalTusByGuid.get(guid)
-    const savedTu = savedTusByGuid.get(guid)
-
-    if (!currentTu || !originalTu || !savedTu) return 'original'
-
-    // Check if current matches original translation
-    if (normalizedArraysEqual(currentTu.ntgt || [], originalTu.ntgt || [])) {
-      return 'original' // Matches original translation from file
-    }
-
-    // Check if current matches saved translation
-    if (normalizedArraysEqual(currentTu.ntgt || [], savedTu.ntgt || [])) {
-      return 'saved' // Matches saved translation (auto-save)
-    }
-
-    // Current differs from both original and saved
-    return 'modified' // Has unsaved changes
-  }
 
   // Validate QA assessment against quality model
   const getQAValidationStatus = (guid: string): { isValid: boolean, message?: string } => {
