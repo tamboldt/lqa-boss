@@ -180,17 +180,20 @@ export const TranslationEditor = forwardRef<TranslationEditorRef, TranslationEdi
   
   const currentPage = flowData?.pages[currentPageIndex]
   
-  // Filter function for translation units
-  const filterTranslationUnits = (tus: TranslationUnit[]): TranslationUnit[] => {
-    let filtered = tus
-
-    // Create a map of original translation units by GUID for quick lookup
-    const originalTuMap = new Map<string, TranslationUnit>()
+  // Memoize original TU map for filter performance
+  const originalTuMap = useMemo(() => {
+    const map = new Map<string, TranslationUnit>()
     if (originalJobData?.tus) {
       originalJobData.tus.forEach(tu => {
-        originalTuMap.set(tu.guid, tu)
+        map.set(tu.guid, tu)
       })
     }
+    return map
+  }, [originalJobData])
+
+  // Memoize filter function to prevent recreation on every render
+  const filterTranslationUnits = useCallback((tus: TranslationUnit[]): TranslationUnit[] => {
+    let filtered = tus
 
     // Apply review status filter first
     if (showOnlyNonReviewed) {
@@ -207,7 +210,7 @@ export const TranslationEditor = forwardRef<TranslationEditorRef, TranslationEdi
         const sourceText = tu.nsrc ? normalizedToString(tu.nsrc).toLowerCase() : ''
         if (sourceText.includes(searchText)) return true
       }
-      
+
       // Search in target text
       if (searchableFields.target) {
         // Use original target text for filtering so edits don't affect filter results
@@ -216,7 +219,7 @@ export const TranslationEditor = forwardRef<TranslationEditorRef, TranslationEdi
         const targetText = targetToSearch ? normalizedToString(targetToSearch).toLowerCase() : ''
         if (targetText.includes(searchText)) return true
       }
-      
+
       // Search in notes
       if (searchableFields.notes && tu.notes) {
         let notesText = ''
@@ -227,29 +230,32 @@ export const TranslationEditor = forwardRef<TranslationEditorRef, TranslationEdi
         }
         if (notesText.includes(searchText)) return true
       }
-      
+
       // Search in rid, sid, guid
       if (searchableFields.rid) {
         const rid = tu.rid !== undefined ? String(tu.rid).toLowerCase() : ''
         if (rid.includes(searchText)) return true
       }
-      
+
       if (searchableFields.sid) {
         const sid = tu.sid !== undefined ? String(tu.sid).toLowerCase() : ''
         if (sid.includes(searchText)) return true
       }
-      
+
       if (searchableFields.guid) {
         const guid = tu.guid ? tu.guid.toLowerCase() : ''
         if (guid.includes(searchText)) return true
       }
-      
+
       return false
     })
-  }
-  
-  // Get filtered job data
-  const filteredJobData = jobData ? { ...jobData, tus: filterTranslationUnits(jobData.tus) } : null
+  }, [showOnlyNonReviewed, filterText, searchableFields, originalTuMap])
+
+  // Memoize filtered job data to prevent unnecessary re-renders
+  const filteredJobData = useMemo(() => {
+    if (!jobData) return null
+    return { ...jobData, tus: filterTranslationUnits(jobData.tus) }
+  }, [jobData, filterTranslationUnits])
 
   // Handle marking current segment as reviewed before navigation
   const handleBeforeNavigate = () => {
