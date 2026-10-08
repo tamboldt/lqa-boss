@@ -121,27 +121,45 @@ export class GCSOperations {
   async listFiles(bucket: string, prefix: string, token: string): Promise<GCSFile[]> {
     try {
       const prefixPath = `${prefix}/`
-      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${bucket}/o?prefix=${encodeURIComponent(prefixPath)}&delimiter=/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
+      const allFiles: GCSFile[] = []
+      let pageToken: string | undefined
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Authentication expired. Please sign in again.')
+      // GCS returns at most 1000 objects per page in lexicographic order, so we must
+      // follow nextPageToken or files sorting after the first page are silently dropped
+      do {
+        const params = new URLSearchParams({
+          prefix: prefixPath,
+          delimiter: '/',
+          fields: 'items(name,size,updated),nextPageToken'
+        })
+        if (pageToken) {
+          params.set('pageToken', pageToken)
         }
-        throw new Error(`Failed to list files: ${response.status} ${response.statusText}`)
-      }
 
-      const result = await response.json()
-      const allFiles = (result.items || [])
-        .map((item: any) => ({
-          name: item.name.replace(`${prefixPath}`, ''),
-          fullName: item.name,
-          size: item.size,
-          updated: item.updated
-        }))
+        const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${bucket}/o?${params.toString()}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Authentication expired. Please sign in again.')
+          }
+          throw new Error(`Failed to list files: ${response.status} ${response.statusText}`)
+        }
+
+        const result = await response.json()
+        for (const item of result.items || []) {
+          allFiles.push({
+            name: item.name.replace(`${prefixPath}`, ''),
+            fullName: item.name,
+            size: item.size,
+            updated: item.updated
+          })
+        }
+        pageToken = result.nextPageToken
+      } while (pageToken)
 
       return allFiles
     } catch (error: any) {
