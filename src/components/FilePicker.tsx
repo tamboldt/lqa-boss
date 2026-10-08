@@ -13,7 +13,7 @@ import {
   Input,
   IconButton,
 } from '@chakra-ui/react'
-import { FiX, FiEdit2, FiCheck, FiFolder } from 'react-icons/fi'
+import { FiX, FiEdit2, FiCheck, FiFolder, FiSearch } from 'react-icons/fi'
 
 export interface PickerFile {
   id: string
@@ -70,6 +70,7 @@ const FilePicker: React.FC<FilePickerProps> = ({
   onBrowseFolders,
 }) => {
   const [showDoneJobs, setShowDoneJobs] = useState(true)
+  const [searchText, setSearchText] = useState('')
   const [isEditing, setIsEditing] = useState(false)
   const [editBucket, setEditBucket] = useState(location?.bucket || '')
   const [editPrefix, setEditPrefix] = useState(location?.prefix || '')
@@ -151,6 +152,16 @@ const FilePicker: React.FC<FilePickerProps> = ({
     lqabossFiles = lqabossFiles.filter(file => {
       const jobId = extractJobId(file.name)
       return !isJobDone(files, jobId)
+    })
+  }
+
+  // Filter by search text: every whitespace-separated term must appear in the file name
+  // (case-insensitive). Applied before the 100-job limit so older jobs can still be found.
+  const searchTerms = searchText.toLowerCase().split(/\s+/).filter(Boolean)
+  if (searchTerms.length > 0) {
+    lqabossFiles = lqabossFiles.filter(file => {
+      const name = file.name.toLowerCase()
+      return searchTerms.every(term => name.includes(term))
     })
   }
 
@@ -319,6 +330,31 @@ const FilePicker: React.FC<FilePickerProps> = ({
           )}
         </Box>
 
+        {/* Search by file name */}
+        <Box px={6} py={3} borderBottom="1px solid" borderColor="gray.100">
+          <HStack gap={2}>
+            <FiSearch color="gray" />
+            <Input
+              size="sm"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search by file name (e.g. rbc fr-CA)"
+              aria-label="Search files by name"
+            />
+            {searchText && (
+              <IconButton
+                onClick={() => setSearchText('')}
+                variant="ghost"
+                size="xs"
+                aria-label="Clear search"
+                title="Clear search"
+              >
+                <FiX />
+              </IconButton>
+            )}
+          </HStack>
+        </Box>
+
         {/* Body */}
         <Box p={6} overflow="auto" maxH="60vh">
           {loading ? (
@@ -340,7 +376,9 @@ const FilePicker: React.FC<FilePickerProps> = ({
             </Box>
           ) : lqabossFiles.length === 0 ? (
             <Text color="gray.600" textAlign="center" py={8}>
-              No .lqaboss files found{locationDisplay ? ` in ${locationDisplay}` : ''}
+              {searchTerms.length > 0
+                ? `No .lqaboss files match "${searchText.trim()}"`
+                : `No .lqaboss files found${locationDisplay ? ` in ${locationDisplay}` : ''}`}
             </Text>
           ) : (
             <Grid templateColumns="repeat(auto-fit, minmax(300px, 1fr))" gap={4}>
