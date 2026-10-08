@@ -542,8 +542,6 @@ const TextSegmentEditor: React.FC<TextSegmentEditorProps> = ({
             css={{
               willChange: isActive ? 'transform' : 'auto',
               backfaceVisibility: 'hidden',
-              contentVisibility: 'auto',
-              containIntrinsicSize: '0 200px',
             }}
             borderRadius="lg"
             border="1px solid"
