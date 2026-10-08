@@ -1,3 +1,11 @@
+## [1.0.5](https://github.com/tamboldt/lqa-boss/compare/v1.0.4...v1.0.5) (2026-10-08)
+
+
+### Bug Fixes
+
+* Paginate GCS file listing so jobs past the first 1000 objects are shown ([#1](https://github.com/tamboldt/lqa-boss/issues/1)) ([946b7a7](https://github.com/tamboldt/lqa-boss/commit/946b7a762b0fadf0b1cad73cc114c9eb0e05167a))
+* Remove content-visibility from segment cards to stop scroll misalignment ([#2](https://github.com/tamboldt/lqa-boss/issues/2)) ([94854b2](https://github.com/tamboldt/lqa-boss/commit/94854b2c95fc42e940b81dd28608773084f27e94))
+
 ## [1.0.4](https://github.com/tamboldt/lqa-boss/compare/v1.0.3...v1.0.4) (2026-04-25)
 
 
