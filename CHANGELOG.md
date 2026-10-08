@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/tamboldt/lqa-boss/compare/v1.0.5...v1.1.0) (2026-10-08)
+
+
+### Features
+
+* Add file name search to the job picker ([#3](https://github.com/tamboldt/lqa-boss/issues/3)) ([e846cb5](https://github.com/tamboldt/lqa-boss/commit/e846cb565539840ff1ee913c612dd8e1c83a6301))
+
 ## [1.0.5](https://github.com/tamboldt/lqa-boss/compare/v1.0.4...v1.0.5) (2026-10-08)
 
 
